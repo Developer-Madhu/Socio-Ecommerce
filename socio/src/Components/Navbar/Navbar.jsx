@@ -1,73 +1,45 @@
-import {
-    IconAdjustments,
-    IconCalendarStats,
-    IconFileAnalytics,
-    IconGauge,
-    IconLock,
-    IconNotes,
-    IconPresentationAnalytics,
-  } from '@tabler/icons-react';
-  import { Code, Group, ScrollArea } from '@mantine/core';
-  import { LinksGroup } from '../NavbarLinksGroup/NavbarLinksGroup';
-  import { UserButton } from '../UserButton/UserButton';
-  import { Logo } from './Logo';
-  import classes from './NavbarNested.module.css';
-  
-  const mockdata = [
-    { label: 'Dashboard', icon: IconGauge },
-    {
-      label: 'Market news',
-      icon: IconNotes,
-      initiallyOpened: true,
-      links: [
-        { label: 'Overview', link: '/' },
-        { label: 'Forecasts', link: '/' },
-        { label: 'Outlook', link: '/' },
-        { label: 'Real time', link: '/' },
-      ],
-    },
-    {
-      label: 'Releases',
-      icon: IconCalendarStats,
-      links: [
-        { label: 'Upcoming releases', link: '/' },
-        { label: 'Previous releases', link: '/' },
-        { label: 'Releases schedule', link: '/' },
-      ],
-    },
-    { label: 'Analytics', icon: IconPresentationAnalytics },
-    { label: 'Contracts', icon: IconFileAnalytics },
-    { label: 'Settings', icon: IconAdjustments },
-    {
-      label: 'Security',
-      icon: IconLock,
-      links: [
-        { label: 'Enable 2FA', link: '/' },
-        { label: 'Change password', link: '/' },
-        { label: 'Recovery codes', link: '/' },
-      ],
-    },
-  ];
-  
-  export function Navbar() {
-    const links = mockdata.map((item) => <LinksGroup {...item} key={item.label} />);
-  
-    return (
-      <nav className={classes.navbar}>
-        <div className={classes.header}>
-          <Group justify="space-between">
-            <Logo style={{ width: 120 }} />
-            <Code fw={700}>v3.1.2</Code>
-          </Group>
-        </div>
-  
-        <ScrollArea className={classes.links}>
-          <div className={classes.linksInner}>{links}</div>
-        </ScrollArea>
-  
-        <div className={classes.footer}>
-          <UserButton />
-        </div>
-      </nav>
-    );
-  }
+import { useState } from 'react';
+import { Burger, Container, Group } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { MantineLogo } from '@mantinex/mantine-logo';
+import classes from './NavbarNested.module.css';
+
+const links = [
+  { link: '/about', label: 'Features' },
+  { link: '/pricing', label: 'Pricing' },
+  { link: '/learn', label: 'Learn' },
+  { link: '/community', label: 'Community' },
+];
+
+export function Navbar() {
+  const [opened, { toggle }] = useDisclosure(false);
+  const [active, setActive] = useState(links[0].link);
+
+  const items = links.map((link) => (
+    <a
+      key={link.label}
+      href={link.link}
+      className={classes.link}
+      data-active={active === link.link || undefined}
+      onClick={(event) => {
+        event.preventDefault();
+        setActive(link.link);
+      }}
+    >
+      {link.label}
+    </a>
+  ));
+
+  return (
+    <header className={classes.header}>
+      <Container size="md" className={classes.inner}>
+        <MantineLogo size={28} />
+        <Group gap={5} visibleFrom="xs">
+          {items}
+        </Group>
+
+        <Burger opened={opened} onClick={toggle} hiddenFrom="xs" size="sm" />
+      </Container>
+    </header>
+  );
+}
