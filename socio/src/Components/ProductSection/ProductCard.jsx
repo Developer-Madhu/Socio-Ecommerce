@@ -43,15 +43,15 @@ const products = [
     id: 2,
     name: "Adidas Ultraboost",
     price: "$179.99",
-    image: "https://images.unsplash.com/photo-1603808033192-1b3a356b9dba",
+    image: "https://images.pexels.com/photos/19090/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=600",
     details:
-      "Boost your performance with Adidas Ultraboost – engineered for superior comfort and speed.",
+      "Boost your performance with Adidas Ultraboost engineered for superior comfort and speed.",
   },
   {
     id: 3,
     name: "Puma RS-X",
     price: "$129.99",
-    image: "https://images.unsplash.com/photo-1595341888016-c6873ef9b472",
+    image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600",
     details:
       "Retro style meets modern performance. Puma RS-X delivers durability and bold design.",
   },
@@ -59,7 +59,7 @@ const products = [
     id: 4,
     name: "New Balance 327",
     price: "$99.99",
-    image: "https://images.unsplash.com/photo-1607083207630-a0e05c82b56d",
+    image: "https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg?auto=compress&cs=tinysrgb&w=600",
     details:
       "Classic meets contemporary in the New Balance 327. A must-have for sneaker lovers.",
   },

@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import './App.css'
-import '@mantine/core/styles.css';
-import { MantineProvider } from '@mantine/core';
 import HomePage from './HomePage';
-import { Navbar } from './Components/Navbar/Navbar';
+import '@mantine/core/styles.css';
+import Navbar from './Components/Navbar/Navbar';
+import { MantineProvider } from '@mantine/core';
 
 function App() {
 
