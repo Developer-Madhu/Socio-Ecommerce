@@ -1,82 +1,129 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Filter, Heart, ShoppingCart, Star, Share2, MessageCircle } from 'lucide-react';
-import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
-import { toast } from 'react-hot-toast';
 import { motion } from 'framer-motion';
+import { toast } from 'react-hot-toast';
 import FilterSidebar from './FilterSidebar';
 
-export const ProductReel = ({ products, filterProducts }) => {
+export const ProductReel = ({ filterProducts }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [currentFilters, setCurrentFilters] = useState({});
-  const [filteredProducts, setFilteredProducts] = useState(products);
-  const [productState, setProductState] = useState(products);
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [productState, setProductState] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Use our custom infinite scroll hook
-  const { 
-    visibleItems, 
-    lastElementRef, 
-    loading, 
-    hasMore,
-    reset
-  } = useInfiniteScroll(filteredProducts, { initialPageSize: 4 });
+  // Fetch products from database
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/admin/products', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch products');
+        }
+
+        const data = await response.json();
+        console.log('Fetched products:', data); // Debug log
+        
+        // Transform the data to include required fields
+        const transformedProducts = data.map(product => ({
+          id: product._id || product.id, // Handle both MongoDB _id and regular id
+          name: product.name,
+          price: parseFloat(product.price),
+          category: product.category,
+          description: product.description || 'No description available',
+          image: product.image,
+          stock: product.stock,
+          rating: product.rating || 4.5,
+          isLiked: false,
+          isInCart: false
+        }));
+
+        console.log('Transformed products:', transformedProducts); // Debug log
+        setProducts(transformedProducts);
+        setFilteredProducts(transformedProducts);
+        setProductState(transformedProducts);
+        toast.success(`Loaded ${transformedProducts.length} products`);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        toast.error('Failed to load products');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   // Handle applying filters
   const handleApplyFilters = (filters) => {
     setCurrentFilters(filters);
     const newFilteredProducts = filterProducts(products, filters);
     setFilteredProducts(newFilteredProducts);
-    reset();
-    
-    // Show toast with count of filtered products
     toast(`Showing ${newFilteredProducts.length} products`);
   };
 
   // Handle liking a product
   const handleLike = (id) => {
-    const updatedProducts = productState.map((product) =>
-      product.id === id
-        ? { ...product, isLiked: !product.isLiked }
-        : product
-    );
-    setProductState(updatedProducts);
-    
-    // Show toast message
-    const product = productState.find(p => p.id === id);
-    if (product) {
-      const isLiked = !product.isLiked;
-      toast(isLiked ? `Added ${product.name} to favorites` : `Removed ${product.name} from favorites`);
-    }
+    setProductState(prevState => {
+      const updatedProducts = prevState.map(product =>
+        product.id === id ? { ...product, isLiked: !product.isLiked } : product
+      );
+      
+      const product = updatedProducts.find(p => p.id === id);
+      if (product) {
+        toast(product.isLiked ? `Added ${product.name} to favorites` : `Removed ${product.name} from favorites`);
+      }
+      
+      return updatedProducts;
+    });
   };
 
   // Handle adding a product to cart
   const handleAddToCart = (id) => {
-    const updatedProducts = productState.map((product) =>
-      product.id === id
-        ? { ...product, isInCart: !product.isInCart }
-        : product
-    );
-    setProductState(updatedProducts);
-    
-    // Show toast message
-    const product = productState.find(p => p.id === id);
-    if (product) {
-      const isInCart = !product.isInCart;
-      toast(
-        isInCart ? `Added ${product.name} to cart` : `Removed ${product.name} from cart`,
-        {
-          description: isInCart ? `$${product.price.toFixed(2)}` : undefined,
-        }
+    setProductState(prevState => {
+      const updatedProducts = prevState.map(product =>
+        product.id === id ? { ...product, isInCart: !product.isInCart } : product
       );
-    }
+      
+      const product = updatedProducts.find(p => p.id === id);
+      if (product) {
+        toast(
+          product.isInCart ? `Added ${product.name} to cart` : `Removed ${product.name} from cart`,
+          {
+            description: product.isInCart ? `$${product.price.toFixed(2)}` : undefined,
+          }
+        );
+      }
+      
+      return updatedProducts;
+    });
   };
 
   const handleShare = (product) => {
     toast(`Shared ${product.name}`);
-    // Add actual share functionality here
   };
 
+  if (isLoading) {
+    return (
+      <div className="h-[calc(100vh-4rem)] flex items-center justify-center bg-black">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-10 w-10 rounded-full border-4 border-gray-400 border-t-white animate-spin"></div>
+          <p className="text-white">Loading products...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-[calc(100vh-4rem)] relative">
+    <div className="h-[calc(100vh-4rem)] relative bg-black">
       {/* Filter Button */}
       <button
         onClick={() => setIsFilterOpen(true)}
@@ -96,20 +143,26 @@ export const ProductReel = ({ products, filterProducts }) => {
 
       {/* Products Reel */}
       <div className="h-full overflow-y-auto snap-y snap-mandatory scrollbar-hide">
-        {visibleItems.map((product, index) => {
-          const currentProduct = productState.find(p => p.id === product.id) || product;
-          const isLast = index === visibleItems.length - 1;
+        {filteredProducts.map((product) => {
+          // Find the current state of this product
+          const currentProduct = productState.find(p => p.id === product.id);
+          if (!currentProduct) return null; // Skip if product not found
           
           return (
-            <div
-              key={product.id}
-              ref={isLast ? lastElementRef : undefined}
+            <motion.div
+              key={currentProduct.id}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
               className="h-[calc(100vh-4rem)] snap-start relative"
             >
               <img
                 src={currentProduct.image}
                 alt={currentProduct.name}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.src = 'https://via.placeholder.com/800x1200?text=Product+Image';
+                }}
               />
               
               {/* Right Side Action Buttons */}
@@ -119,11 +172,11 @@ export const ProductReel = ({ products, filterProducts }) => {
                   onClick={() => handleLike(currentProduct.id)}
                   className={`p-3 rounded-full ${
                     currentProduct.isLiked
-                      ? 'bg-blue-500 text-white'
+                      ? 'bg-red-500 text-white'
                       : 'bg-white/20 backdrop-blur-sm text-white hover:bg-white/30'
                   } transition-colors duration-200`}
                 >
-                  <Heart className="w-6 h-6" />
+                  <Heart className={`w-6 h-6 ${currentProduct.isLiked ? 'fill-current' : ''}`} />
                 </motion.button>
 
                 <motion.button
@@ -135,7 +188,7 @@ export const ProductReel = ({ products, filterProducts }) => {
                       : 'bg-white/20 backdrop-blur-sm text-white hover:bg-white/30'
                   } transition-colors duration-200`}
                 >
-                  <ShoppingCart className="w-6 h-6" />
+                  <ShoppingCart className={`w-6 h-6 ${currentProduct.isInCart ? 'fill-current' : ''}`} />
                 </motion.button>
 
                 <motion.button
@@ -163,22 +216,16 @@ export const ProductReel = ({ products, filterProducts }) => {
                     <span className="ml-1 text-sm text-white">{currentProduct.rating}</span>
                   </div>
                 </div>
-                <p className="text-white text-lg font-bold mb-4">${currentProduct.price}</p>
-                <p className="text-white/80 text-sm mb-4 line-clamp-2">{currentProduct.description || 'No description available'}</p>
+                <p className="text-white text-lg font-bold mb-4">${currentProduct.price.toFixed(2)}</p>
+                <p className="text-white/80 text-sm mb-4 line-clamp-2">{currentProduct.description}</p>
+                <p className="text-white/60 text-xs">Stock: {currentProduct.stock} units</p>
               </div>
-            </div>
+            </motion.div>
           );
         })}
-        
-        {/* Loading indicator */}
-        {loading && (
-          <div className="w-full py-10 flex justify-center">
-            <div className="h-10 w-10 rounded-full border-4 border-gray-200 border-t-pink-500 animate-spin"></div>
-          </div>
-        )}
-        
+
         {/* No results */}
-        {!loading && visibleItems.length === 0 && (
+        {filteredProducts.length === 0 && (
           <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
             <div className="text-center p-8">
               <h3 className="text-xl font-semibold mb-2 text-white">No products found</h3>

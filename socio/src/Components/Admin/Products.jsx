@@ -46,7 +46,6 @@ const Products = () => {
       }
 
       const data = await response.json();
-      console.log(data)
       setProducts(data);
     } catch (error) {
       console.error('Error fetching products:', error);
