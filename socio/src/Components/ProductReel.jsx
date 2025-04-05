@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Filter, Heart, ShoppingCart, Star, Share2, MessageCircle } from 'lucide-react';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
-import { toast } from 'sonner';
+import { toast } from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import FilterSidebar from './FilterSidebar';
 
