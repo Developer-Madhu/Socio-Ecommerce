@@ -23,12 +23,13 @@ function App() {
         <Routes>
           <Route path='/' element={<HomePage />} />
           <Route path='/reelshop' element={<Index />} />
-          <Route path="/admin" element={<AdminLayout />} />
-          <Route path='/admin/dashboard' element={<Dashboard />} />
-          <Route path="/admin/products" element={<Products />} />
-          <Route path="/admin/orders" element={<Orders />} />
-          <Route path="/admin/users" element={<Users />} />
-          <Route path="/admin/analytics" element={<Analytics />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="products" element={<Products />} />
+            <Route path="orders" element={<Orders />} />
+            <Route path="users" element={<Users />} />
+            <Route path="analytics" element={<Analytics />} />
+          </Route>
         </Routes>
       </BrowserRouter>
 

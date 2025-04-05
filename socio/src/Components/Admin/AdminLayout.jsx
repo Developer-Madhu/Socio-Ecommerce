@@ -8,14 +8,14 @@ import {
   BarChart2,
   LogOut
 } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 
 const AdminLayout = ({ children }) => {
   const location = useLocation();
 
   const menuItems = [
     { path: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
-    { path: '/products', icon: Package, label: 'Products' },
+    { path: '/admin/products', icon: Package, label: 'Products' },
     { path: '/admin/orders', icon: ShoppingCart, label: 'Orders' },
     { path: '/admin/users', icon: Users, label: 'Users' },
     { path: '/admin/analytics', icon: BarChart2, label: 'Analytics' },
@@ -31,14 +31,14 @@ const AdminLayout = ({ children }) => {
               {menuItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
-                
+
                 return (
                   <Link
                     key={item.path}
                     to={item.path}
                     className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                      isActive 
-                        ? 'bg-blue-50 text-blue-600' 
+                      isActive
+                        ? 'bg-blue-50 text-blue-600'
                         : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                     }`}
                   >
@@ -63,7 +63,7 @@ const AdminLayout = ({ children }) => {
             transition={{ duration: 0.3 }}
             className="pt-6"
           >
-            {children}
+            <Outlet />
           </motion.div>
         </AnimatePresence>
       </div>
