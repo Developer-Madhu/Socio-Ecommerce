@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -11,6 +11,7 @@ const Login = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate(); // Added navigate
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,15 +26,24 @@ const Login = () => {
         body: JSON.stringify(formData),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Login failed');
+        throw new Error(data.msg || 'Login failed');
       }
 
-      const data = await response.json();
-      // Handle successful login (store token, redirect, etc.)
-      toast.success('Login successful!');
+      localStorage.setItem('token', data.token); // Store token
+      
+      // Store user data (assuming backend returns user object)
+      if (data.user) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+      }
+
+      toast.success(data.msg || 'Login successful!');
+      navigate('/'); // Redirect after successful login
+      
     } catch (error) {
-      toast.error('Invalid credentials');
+      toast.error(error.message || 'Invalid credentials');
     } finally {
       setIsLoading(false);
     }
