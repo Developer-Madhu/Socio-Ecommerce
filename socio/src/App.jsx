@@ -12,7 +12,8 @@ import Orders from './Components/Admin/Orders';
 import { Users } from 'lucide-react';
 import Analytics from './Components/Admin/Analytics';
 import Dashboard from './Components/Admin/Dashboard';
-
+import Login from './Components/Auth/Login';
+import Register from './Components/Auth/Register';
 function App() {
 
   return (
@@ -30,6 +31,8 @@ function App() {
             <Route path="users" element={<Users />} />
             <Route path="analytics" element={<Analytics />} />
           </Route>
+          <Route path='/auth/login' element={<Login />} />
+          <Route path='/auth/register' element={<Register />} />
         </Routes>
       </BrowserRouter>
 
