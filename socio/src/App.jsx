@@ -14,6 +14,7 @@ import Analytics from './Components/Admin/Analytics';
 import Dashboard from './Components/Admin/Dashboard';
 import Login from './Components/Auth/Login';
 import Register from './Components/Auth/Register';
+import Page from './Pages/Page';
 function App() {
 
   return (
@@ -22,7 +23,7 @@ function App() {
       <BrowserRouter>
         <Navbar />
         <Routes>
-          <Route path='/' element={<HomePage />} />
+          <Route path='/' element={<Page />} />
           <Route path='/reelshop' element={<Index />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />
