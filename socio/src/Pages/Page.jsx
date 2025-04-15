@@ -30,6 +30,53 @@ const Page = () => {
     }
   ];
 
+  // Add this after your existing state variables
+  const trendingProducts = [
+    {
+      _id: 't1',
+      name: 'Limited Edition Smart Watch',
+      price: 299.99,
+      image: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=800',
+      description: 'Latest generation smartwatch with health tracking',
+      trending: true,
+      badge: 'Hot Deal',
+      discount: '20% OFF',
+      soldCount: 156
+    },
+    {
+      _id: 't2',
+      name: 'Wireless Noise Cancelling Headphones',
+      price: 199.99,
+      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800',
+      description: 'Premium sound quality with active noise cancellation',
+      trending: true,
+      badge: 'Best Seller',
+      discount: '15% OFF',
+      soldCount: 243
+    },
+    {
+      _id: 't3',
+      name: 'Premium Leather Backpack',
+      price: 129.99,
+      image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800',
+      description: 'Handcrafted genuine leather backpack',
+      trending: true,
+      badge: 'New Arrival',
+      soldCount: 89
+    },
+    {
+      _id: 't4',
+      name: 'Designer Sunglasses',
+      price: 159.99,
+      image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=800',
+      description: 'UV protection with premium design',
+      trending: true,
+      badge: 'Trending',
+      discount: '10% OFF',
+      soldCount: 178
+    }
+  ];
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -310,48 +357,123 @@ const Page = () => {
       {/* Trending Section */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold">Trending Now</h2>
+          <div className="flex items-center justify-between mb-12">
+            <div>
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Trending Now
+              </h2>
+              <p className="text-gray-600 mt-2">Discover what's hot right now</p>
+            </div>
             <Link
               to="/trending"
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium group"
             >
               View All
+              <motion.span
+                animate={{ x: [0, 5, 0] }}
+                transition={{ repeat: Infinity, duration: 1.5 }}
+              >
+                →
+              </motion.span>
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products
-              .filter((product) => product.trending)
-              .slice(0, 3)
-              .map((product) => (
-                <motion.div
-                  key={product._id}
-                  whileHover={{ y: -5 }}
-                  className="bg-white rounded-lg shadow-md overflow-hidden"
-                >
-                  <div className="relative">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-64 object-cover"
-                    />
-                    <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-sm">
-                      Trending
-                    </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {trendingProducts.map((product, index) => (
+              <motion.div
+                key={product._id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                whileHover={{ y: -8 }}
+                className="group relative bg-white rounded-xl shadow-lg overflow-hidden"
+              >
+                {/* Badge */}
+                <div className="absolute top-4 left-4 z-10">
+                  <span className="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">
+                    {product.badge}
+                  </span>
+                </div>
+
+                {/* Discount Tag */}
+                {product.discount && (
+                  <div className="absolute top-4 right-4 z-10">
+                    <span className="px-3 py-1 bg-red-500 text-white text-sm font-medium rounded-full">
+                      {product.discount}
+                    </span>
                   </div>
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
-                    <div className="flex justify-between items-center">
-                      <span className="text-xl font-bold text-blue-600">
+                )}
+
+                {/* Image Container */}
+                <div className="relative h-64 overflow-hidden">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </div>
+
+                {/* Content */}
+                <div className="p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-1">
+                    {product.name}
+                  </h3>
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                    {product.description}
+                  </p>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-2xl font-bold text-blue-600">
                         ${product.price}
                       </span>
-                      <button className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors">
-                        <ShoppingCart className="w-5 h-5" />
-                      </button>
+                      {product.discount && (
+                        <span className="ml-2 text-sm text-gray-500 line-through">
+                          ${(product.price * 1.2).toFixed(2)}
+                        </span>
+                      )}
                     </div>
+                    <span className="text-sm text-gray-500">
+                      {product.soldCount} sold
+                    </span>
                   </div>
-                </motion.div>
-              ))}
+
+                  {/* Action Buttons */}
+                  <div className="flex items-center gap-2 mt-4">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                    >
+                      Add to Cart
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                    >
+                      <Heart className="w-5 h-5 text-gray-600" />
+                    </motion.button>
+                  </div>
+
+                  {/* Progress Bar for Sales */}
+                  <div className="mt-4">
+                    <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileInView={{ width: `${Math.min((product.soldCount / 300) * 100, 100)}%` }}
+                        transition={{ duration: 1, ease: "easeOut" }}
+                        className="h-full bg-gradient-to-r from-blue-600 to-purple-600"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {300 - product.soldCount} items left
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
